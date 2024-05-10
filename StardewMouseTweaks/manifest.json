@@ -1,0 +1,11 @@
+{
+  "Name": "Mouse Tweaks",
+  "Author": "Lordfirespeed",
+  "Description": "Adds various convenience behaviours regarding item stacks to help with inventory management.",
+  "UniqueID": "Lordfirespeed.StardewMouseTweaks",
+  "EntryDll": "StardewMouseTweaks.dll",
+  "MinimumApiVersion": "4.0.0",
+  "UpdateKeys": [
+    "GitHub:Lordfirespeed/StardewMouseTweaks"
+  ]
+}
