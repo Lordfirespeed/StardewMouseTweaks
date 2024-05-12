@@ -3,12 +3,11 @@
         <PropertyGroup>
             <PlainVersion>$(MinVerMajor).$(MinVerMinor).$(MinVerPatch)</PlainVersion>
         </PropertyGroup>
-        <Copy SourceFiles="$(ProjectDir)manifest.json" DestinationFiles="$(IntermediateOutputPath)manifest-old.json" />
         <Exec Command="jq --arg version &quot;$(MinVerVersion)&quot; '.Version = $version' $(ProjectDir)manifest.json > $(IntermediateOutputPath)manifest.json" />
         <Copy SourceFiles="$(IntermediateOutputPath)manifest.json" DestinationFiles="$(ProjectDir)manifest.json" />
     </Target>
 
     <Target Name="ClearManifestVersion" AfterTargets="PostBuildEvent" DependsOnTargets="AfterBuild" >
-        <Copy SourceFiles="$(IntermediateOutputPath)manifest-old.json" DestinationFiles="$(ProjectDir)manifest.json" />
+        <Exec Command="jq 'del(.Version)' $(IntermediateOutputPath)manifest.json > $(ProjectDir)manifest.json" />
     </Target>
 </Project>
