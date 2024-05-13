@@ -20,5 +20,6 @@ public class BreadcrumbOperation : DragOperationBase
     public override void Complete()
     {
         Monitor.Log("Completed breadcrumb operation", LogLevel.Info);
+        base.Complete();
     }
 }

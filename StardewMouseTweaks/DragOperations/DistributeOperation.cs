@@ -20,5 +20,6 @@ public class DistributeOperation : DragOperationBase
     public override void Complete()
     {
         Monitor.Log("Completed distribute operation", LogLevel.Info);
+        base.Complete();
     }
 }
