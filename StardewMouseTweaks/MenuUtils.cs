@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using StardewModdingAPI;
 using StardewMouseTweaks.Extensions;
@@ -59,6 +60,48 @@ public static class MenuUtils
                 menu = onScreenMenu;
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    public static bool TryGetHoveredInventoryMenu(ICursorPosition cursorPosition, [MaybeNullWhen(false)] out InventoryMenu menu)
+    {
+        menu = null;
+        if (!TryGetHoveredClickableMenu(cursorPosition, out var clickableMenu)) return false;
+
+        if (clickableMenu is GameMenu gameMenu ) {
+            if (gameMenu.currentTab == GameMenu.inventoryTab) {
+                menu = (gameMenu.pages[GameMenu.inventoryTab] as InventoryPage)!.inventory;
+                return true;
+            }
+
+            if (gameMenu.currentTab == GameMenu.craftingTab) {
+                menu = (gameMenu.pages[GameMenu.craftingTab] as CraftingPage)!.inventory;
+                return true;
+            }
+
+            return false;
+        }
+
+        if (clickableMenu is ItemGrabMenu itemGrabMenu) {
+            throw new NotImplementedException();
+        }
+
+        if (clickableMenu is JunimoNoteMenu junimoNoteMenu) {
+            throw new NotImplementedException();
+        }
+
+        if (clickableMenu is QuestContainerMenu) {
+            throw new NotImplementedException();
+        }
+
+        if (clickableMenu is ShopMenu) {
+            throw new NotImplementedException();
+        }
+
+        if (clickableMenu is StorageContainer) {
+            throw new NotImplementedException();
         }
 
         return false;
