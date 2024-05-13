@@ -31,8 +31,8 @@ public abstract class DragOperationBase : IDisposable
             HoveredSlot = null;
             return;
         }
-        if (HoveredSlot == slot.Value) return;
-        HoveredSlot = slot.Value;
+        if (HoveredSlot == slot) return;
+        HoveredSlot = slot;
         HoveredSlotChanged();
     }
 

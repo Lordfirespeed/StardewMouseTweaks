@@ -33,7 +33,7 @@ public static class InventoryMenuExtensions
 
     public static InventoryMenuEnumerator GetEnumerator(this InventoryMenu menu) => new InventoryMenuEnumerator(menu);
 
-    public readonly record struct InventorySlot
+    public record InventorySlot
     {
         public required InventoryMenu InventoryMenu { get; init; }
         public required int Index { get; init; }
@@ -50,11 +50,11 @@ public static class InventoryMenuExtensions
             return HashCode.Combine(InventoryMenu, Index);
         }
 
-        public bool Equals(InventorySlot? other)
+        public virtual bool Equals(InventorySlot? other)
         {
-            if (!other.HasValue) return false;
-            if (!ReferenceEquals(InventoryMenu, other.Value.InventoryMenu)) return false;
-            if (Index != other.Value.Index) return false;
+            if (other is null) return false;
+            if (!ReferenceEquals(InventoryMenu, other.InventoryMenu)) return false;
+            if (Index != other.Index) return false;
             return true;
         }
     }

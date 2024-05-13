@@ -87,7 +87,7 @@ public class DragOperationManager
 
             _ongoingDragOperationTrigger = args.Button;
             _ongoingDragOperation = new BreadcrumbOperation(Helper, Monitor) {
-                InitialHoveredSlot = slot.Value,
+                InitialHoveredSlot = slot,
             };
             _ongoingDragOperation.Completed += OnOngoingDragOperationCompleted;
         }
@@ -98,7 +98,7 @@ public class DragOperationManager
 
             _ongoingDragOperationTrigger = args.Button;
             _ongoingDragOperation = new DistributeOperation(Helper, Monitor) {
-                InitialHoveredSlot = slot.Value,
+                InitialHoveredSlot = slot,
             };
             _ongoingDragOperation.Completed += OnOngoingDragOperationCompleted;
         }
