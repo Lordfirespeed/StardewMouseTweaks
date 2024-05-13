@@ -27,7 +27,12 @@ public abstract class DragOperationBase : IDisposable
 
     protected abstract void HoveredSlotChanged();
 
-    public abstract void Complete();
+    public virtual void Complete()
+    {
+        Completed?.Invoke(this, EventArgs.Empty);
+    }
+
+    public event EventHandler<EventArgs>? Completed;
 
     public virtual void Dispose()
     {

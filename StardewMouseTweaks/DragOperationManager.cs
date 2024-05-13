@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -86,6 +87,7 @@ public class DragOperationManager
             _ongoingDragOperation = new BreadcrumbOperation(Helper, Monitor) {
                 InitialCursorPosition = args.Cursor,
             };
+            _ongoingDragOperation.Completed += OnOngoingDragOperationCompleted;
         }
 
         void OnPrimaryButtonPressed()
@@ -96,6 +98,7 @@ public class DragOperationManager
             _ongoingDragOperation = new DistributeOperation(Helper, Monitor) {
                 InitialCursorPosition = args.Cursor,
             };
+            _ongoingDragOperation.Completed += OnOngoingDragOperationCompleted;
         }
     }
 
@@ -143,7 +146,6 @@ public class DragOperationManager
             if (_ongoingDragOperation is not BreadcrumbOperation breadcrumbOperation) return;
 
             breadcrumbOperation.Complete();
-            ResetOngoingDragOperation();
         }
 
         void OnPrimaryButtonReleased()
@@ -152,7 +154,6 @@ public class DragOperationManager
             if (_ongoingDragOperation is not DistributeOperation distributeOperation) return;
 
             distributeOperation.Complete();
-            ResetOngoingDragOperation();
         }
     }
 
@@ -191,9 +192,15 @@ public class DragOperationManager
         }
     }
 
+    private void OnOngoingDragOperationCompleted(object? sender, EventArgs args)
+    {
+        ResetOngoingDragOperation();
+    }
+
     private void ResetOngoingDragOperation()
     {
         if (_ongoingDragOperation is null) return;
+        _ongoingDragOperation.Completed -= OnOngoingDragOperationCompleted;
 
         _ongoingDragOperation.Dispose();
         _ongoingDragOperation = null;
