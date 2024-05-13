@@ -1,6 +1,7 @@
 using System;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using StardewMouseTweaks.Extensions;
 
 namespace StardewMouseTweaks.DragOperations;
 
@@ -8,9 +9,12 @@ public abstract class DragOperationBase : IDisposable
 {
     private IModHelper Helper { get; }
 
-    public required ICursorPosition InitialCursorPosition {
+    protected InventoryMenuExtensions.InventorySlot? HoveredSlot;
+
+    public required InventoryMenuExtensions.InventorySlot? InitialHoveredSlot {
         init {
-            // todo : call HoveredSlotChanged
+            HoveredSlot = value;
+            HoveredSlotChanged();
         }
     }
 
@@ -22,7 +26,14 @@ public abstract class DragOperationBase : IDisposable
 
     private void OnCursorMoved(object? sender, CursorMovedEventArgs args)
     {
-
+        if (!MenuUtils.TryGetHoveredInventoryMenu(args.NewPosition, out var menu)) return;
+        if (!menu.TryGetHoveredItemSlot(args.NewPosition, out var slot)) {
+            HoveredSlot = null;
+            return;
+        }
+        if (HoveredSlot == slot.Value) return;
+        HoveredSlot = slot.Value;
+        HoveredSlotChanged();
     }
 
     protected abstract void HoveredSlotChanged();
