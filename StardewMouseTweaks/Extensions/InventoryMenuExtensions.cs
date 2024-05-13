@@ -40,9 +40,11 @@ public static class InventoryMenuExtensions
 
         public ClickableComponent ClickableComponent => InventoryMenu.inventory[Index];
 
-        public Item? Item {
-            get => InventoryMenu.actualInventory[Index];
-            set => InventoryMenu.actualInventory[Index] = value;
+        public Item? Item => InventoryMenu.actualInventory[Index];
+
+        public Item? AddItem(Item itemToAdd, ItemGrabMenu.behaviorOnItemSelect? onAddFunction = null)
+        {
+            return Utility.addItemToInventory(itemToAdd, Index, InventoryMenu.actualInventory, onAddFunction);
         }
 
         public override int GetHashCode()
