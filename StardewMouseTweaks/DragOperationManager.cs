@@ -68,13 +68,18 @@ public class DragOperationManager
 
         return;
 
+        bool BeginDragOperationConditionsAreMet()
+        {
+            if (!MenuUtils.ClickableMenusCanReceiveSecondaryButtonPresses()) return false;
+            if (!MenuUtils.TryGetHoveredInventoryMenu(args.Cursor, out var menu)) return false;
+            if (!menu.TryGetHoveredItemSlot(args.Cursor, out var slot)) return false;
+            if (_ongoingDragOperation is not null) return false;
+            return true;
+        }
+
         void OnSecondaryButtonPressed()
         {
-            if (!MenuUtils.ClickableMenusCanReceiveSecondaryButtonPresses()) return;
-            if (!MenuUtils.TryGetHoveredInventoryMenu(args.Cursor, out var menu)) return;
-            if (!menu.TryGetHoveredItemSlot(args.Cursor, out var slot)) return;
-            Monitor.Log(slot.Value.Item?.Name ?? "None", LogLevel.Info);
-            if (_ongoingDragOperation is not null) return;
+            if (!BeginDragOperationConditionsAreMet()) return;
 
             _ongoingDragOperationTrigger = args.Button;
             _ongoingDragOperation = new BreadcrumbOperation(Helper, Monitor) {
@@ -84,11 +89,7 @@ public class DragOperationManager
 
         void OnPrimaryButtonPressed()
         {
-            if (!MenuUtils.ClickableMenusCanReceivePrimaryButtonPresses()) return;
-            if (!MenuUtils.TryGetHoveredInventoryMenu(args.Cursor, out var menu)) return;
-            if (!menu.TryGetHoveredItemSlot(args.Cursor, out var slot)) return;
-            Monitor.Log(slot.Value.Item?.Name ?? "None", LogLevel.Info);
-            if (_ongoingDragOperation is not null) return;
+            if (!BeginDragOperationConditionsAreMet()) return;
 
             _ongoingDragOperationTrigger = args.Button;
             _ongoingDragOperation = new DistributeOperation(Helper, Monitor) {
