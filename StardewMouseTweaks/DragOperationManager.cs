@@ -2,6 +2,7 @@ using System.Linq;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewMouseTweaks.DragOperations;
+using StardewMouseTweaks.Extensions;
 using StardewValley;
 
 namespace StardewMouseTweaks;
@@ -70,8 +71,9 @@ public class DragOperationManager
         void OnSecondaryButtonPressed()
         {
             if (!MenuUtils.ClickableMenusCanReceiveSecondaryButtonPresses()) return;
-            if (!MenuUtils.TryGetHoveredClickableMenu(args.Cursor, out var menu)) return;
-            Monitor.Log(menu.GetType().Name, LogLevel.Info);
+            if (!MenuUtils.TryGetHoveredInventoryMenu(args.Cursor, out var menu)) return;
+            if (!menu.TryGetHoveredItemSlot(args.Cursor, out var slot)) return;
+            Monitor.Log(slot.Value.Item?.Name ?? "None", LogLevel.Info);
             if (_ongoingDragOperation is not null) return;
 
             _ongoingDragOperationTrigger = args.Button;
@@ -83,7 +85,9 @@ public class DragOperationManager
         void OnPrimaryButtonPressed()
         {
             if (!MenuUtils.ClickableMenusCanReceivePrimaryButtonPresses()) return;
-            if (!MenuUtils.TryGetHoveredClickableMenu(args.Cursor, out var menu)) return;
+            if (!MenuUtils.TryGetHoveredInventoryMenu(args.Cursor, out var menu)) return;
+            if (!menu.TryGetHoveredItemSlot(args.Cursor, out var slot)) return;
+            Monitor.Log(slot.Value.Item?.Name ?? "None", LogLevel.Info);
             if (_ongoingDragOperation is not null) return;
 
             _ongoingDragOperationTrigger = args.Button;
