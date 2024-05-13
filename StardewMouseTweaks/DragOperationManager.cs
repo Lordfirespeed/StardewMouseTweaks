@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -69,11 +70,12 @@ public class DragOperationManager
 
         return;
 
-        bool BeginDragOperationConditionsAreMet()
+        bool BeginDragOperationConditionsAreMet([NotNullWhen(true)] out InventoryMenuExtensions.InventorySlot? slot)
         {
+            slot = null;
             if (!MenuUtils.ClickableMenusCanReceiveSecondaryButtonPresses()) return false;
             if (!MenuUtils.TryGetHoveredInventoryMenu(args.Cursor, out var menu)) return false;
-            if (!menu.TryGetHoveredItemSlot(args.Cursor, out var slot)) return false;
+            if (!menu.TryGetHoveredItemSlot(args.Cursor, out slot)) return false;
             if (Game1.player.CursorSlotItem is null) return false;
             if (_ongoingDragOperation is not null) return false;
             return true;
@@ -81,22 +83,22 @@ public class DragOperationManager
 
         void OnSecondaryButtonPressed()
         {
-            if (!BeginDragOperationConditionsAreMet()) return;
+            if (!BeginDragOperationConditionsAreMet(out var slot)) return;
 
             _ongoingDragOperationTrigger = args.Button;
             _ongoingDragOperation = new BreadcrumbOperation(Helper, Monitor) {
-                InitialCursorPosition = args.Cursor,
+                InitialHoveredSlot = slot.Value,
             };
             _ongoingDragOperation.Completed += OnOngoingDragOperationCompleted;
         }
 
         void OnPrimaryButtonPressed()
         {
-            if (!BeginDragOperationConditionsAreMet()) return;
+            if (!BeginDragOperationConditionsAreMet(out var slot)) return;
 
             _ongoingDragOperationTrigger = args.Button;
             _ongoingDragOperation = new DistributeOperation(Helper, Monitor) {
-                InitialCursorPosition = args.Cursor,
+                InitialHoveredSlot = slot.Value,
             };
             _ongoingDragOperation.Completed += OnOngoingDragOperationCompleted;
         }
