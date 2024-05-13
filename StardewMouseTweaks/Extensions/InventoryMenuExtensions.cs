@@ -44,6 +44,19 @@ public static class InventoryMenuExtensions
             get => InventoryMenu.actualInventory[Index];
             set => InventoryMenu.actualInventory[Index] = value;
         }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(InventoryMenu, Index);
+        }
+
+        public bool Equals(InventorySlot? other)
+        {
+            if (!other.HasValue) return false;
+            if (!ReferenceEquals(InventoryMenu, other.Value.InventoryMenu)) return false;
+            if (Index != other.Value.Index) return false;
+            return true;
+        }
     }
 
     public struct InventoryMenuEnumerator : IEnumerator<InventorySlot>
