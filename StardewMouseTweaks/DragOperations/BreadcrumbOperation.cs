@@ -16,7 +16,6 @@ public class BreadcrumbOperation : DragOperationBase
 
     protected override void HoveredSlotChanged()
     {
-        Monitor.Log($"Hmrmr, {HoveredSlot?.Index}", LogLevel.Info);
         if (HoveredSlot is null) return;
         if (Game1.player.CursorSlotItem is not { } cursorSlotItem) throw new InvalidOperationException();
 
