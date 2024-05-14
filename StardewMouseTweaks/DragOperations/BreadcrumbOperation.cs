@@ -11,7 +11,7 @@ public class BreadcrumbOperation : DragOperationBase
     public BreadcrumbOperation(IModHelper helper, IMonitor monitor) : base(helper)
     {
         Monitor = monitor;
-        Monitor.Log("Started breadcrumb operation", LogLevel.Info);
+        Monitor.Log("Started breadcrumb operation", LogLevel.Debug);
     }
 
     protected override void HoveredSlotChanged()
@@ -34,7 +34,7 @@ public class BreadcrumbOperation : DragOperationBase
 
     public override void Complete()
     {
-        Monitor.Log("Completed breadcrumb operation", LogLevel.Info);
+        Monitor.Log("Completed breadcrumb operation", LogLevel.Debug);
         base.Complete();
     }
 }

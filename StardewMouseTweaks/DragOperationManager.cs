@@ -178,19 +178,19 @@ public class DragOperationManager
 
         void OnMenuClosed()
         {
-            Monitor.Log("Menu closed", LogLevel.Info);
+            Monitor.Log("Menu closed", LogLevel.Debug);
             ResetOngoingDragOperation();
         }
 
         void OnMenuSwapped()
         {
-            Monitor.Log("Menu swapped", LogLevel.Info);
+            Monitor.Log("Menu swapped", LogLevel.Debug);
             ResetOngoingDragOperation();
         }
 
         void OnMenuOpened()
         {
-            Monitor.Log("Menu opened", LogLevel.Info);
+            Monitor.Log("Menu opened", LogLevel.Debug);
         }
     }
 
