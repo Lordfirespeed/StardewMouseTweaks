@@ -13,8 +13,15 @@ using Vector2 = Microsoft.Xna.Framework.Vector2;
 namespace StardewMouseTweaks.Patches;
 
 [HarmonyPatch(typeof(ItemGrabMenu))]
-public class ItemGrabMenuPatches
+public class ItemGrabMenuPatches : IPatch
 {
+    private static IModHelper _helper = null!;
+
+    public void Initialize(IModHelper helper, IMonitor monitor)
+    {
+        _helper = helper;
+    }
+
     [HarmonyPatch(nameof(ItemGrabMenu.draw))]
     [HarmonyTranspiler]
     [UsedImplicitly]
