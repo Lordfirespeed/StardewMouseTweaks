@@ -8,7 +8,7 @@ namespace StardewMouseTweaks;
 [UsedImplicitly]
 internal sealed class Entrypoint : Mod
 {
-    internal static new IMonitor Monitor { get; private set; } = null!;
+    internal new static IMonitor Monitor { get; private set; } = null!;
 
     private DragOperationManager _dragOperationManager = null!;
     private Harmony _harmony = null!;
