@@ -2,14 +2,17 @@ using System.Collections.Generic;
 using System.Reflection.Emit;
 using HarmonyLib;
 using JetBrains.Annotations;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 
 namespace StardewMouseTweaks.Patches;
 
 [HarmonyPatch(typeof(InventoryMenu))]
-public class InventoryMenuPatches
+public class InventoryMenuPatches : IPatch
 {
+    public void Initialize(IModHelper helper, IMonitor monitor) { }
+
     [HarmonyPatch(nameof(InventoryMenu.rightClick))]
     [HarmonyTranspiler]
     [UsedImplicitly]
