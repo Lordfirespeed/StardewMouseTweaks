@@ -17,7 +17,7 @@ public class BreadcrumbOperation : DragOperationBase
     protected override void HoveredSlotChanged()
     {
         if (HoveredSlot is null) return;
-        if (Game1.player.CursorSlotItem is not { } cursorSlotItem) throw new InvalidOperationException();
+        if (MenuUtils.CursorSlotItem is not { } cursorSlotItem) throw new InvalidOperationException();
 
         var singleItem = cursorSlotItem.getOne();
         if (HoveredSlot.Item is { } hoveredItem && !singleItem.canStackWith(hoveredItem)) return;
@@ -26,7 +26,7 @@ public class BreadcrumbOperation : DragOperationBase
 
         cursorSlotItem.Stack -= 1;
         if (cursorSlotItem.Stack == 0) {
-            Game1.player.CursorSlotItem = null;
+            MenuUtils.CursorSlotItem = null;
             Complete();
         }
     }

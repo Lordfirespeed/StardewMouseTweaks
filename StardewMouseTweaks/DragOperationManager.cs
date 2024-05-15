@@ -76,7 +76,7 @@ public class DragOperationManager
             if (!MenuUtils.ClickableMenusCanReceiveSecondaryButtonPresses()) return false;
             if (!MenuUtils.TryGetHoveredInventoryMenu(args.Cursor, out var menu)) return false;
             if (!menu.TryGetHoveredItemSlot(args.Cursor, out slot)) return false;
-            if (Game1.player.CursorSlotItem is null) return false;
+            if (MenuUtils.CursorSlotItem is null) return false;
             if (_ongoingDragOperation is not null) return false;
             return true;
         }
