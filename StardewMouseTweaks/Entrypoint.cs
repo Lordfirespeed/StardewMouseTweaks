@@ -13,6 +13,11 @@ internal sealed class Entrypoint : Mod
     private DragOperationManager _dragOperationManager = null!;
     private Harmony _harmony = null!;
 
+    private static readonly IPatch[] Patches = [
+        new InventoryMenuPatches(),
+        new ItemGrabMenuPatches(),
+    ];
+
     /// <summary>
     /// Entrypoint.
     /// </summary>
@@ -22,8 +27,10 @@ internal sealed class Entrypoint : Mod
     {
         Monitor = base.Monitor;
         _harmony = new Harmony(ModManifest.UniqueID);
-        _harmony.CreateClassProcessor(typeof(InventoryMenuPatches)).Patch();
-        _harmony.CreateClassProcessor(typeof(ItemGrabMenuPatches)).Patch();
+        foreach (var patch in Patches) {
+            patch.Initialize(helper, Monitor);
+            _harmony.CreateClassProcessor(patch.GetType()).Patch();
+        }
         _dragOperationManager = new DragOperationManager(helper, Monitor);
     }
 }
