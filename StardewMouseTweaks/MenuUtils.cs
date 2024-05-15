@@ -106,4 +106,54 @@ public static class MenuUtils
 
         return false;
     }
+
+    public static Item? CursorSlotItem {
+        get {
+            if (!TryGetCurrentActiveMenu(out var menu))
+                return Game1.player.CursorSlotItem;
+
+            if (menu is GameMenu gameMenu ) {
+                if (gameMenu.currentTab == GameMenu.inventoryTab)
+                    return Game1.player.CursorSlotItem;
+
+                if (gameMenu.currentTab == GameMenu.craftingTab)
+                    return (gameMenu.pages[GameMenu.craftingTab] as CraftingPage)!.heldItem;
+
+                throw new InvalidOperationException();
+            }
+
+            if (menu is MenuWithInventory menuWithInventory) {
+                return menuWithInventory.heldItem;
+            }
+
+            return Game1.player.CursorSlotItem;
+        }
+        set {
+            if (!TryGetCurrentActiveMenu(out var menu)) {
+                Game1.player.CursorSlotItem = value;
+                return;
+            }
+
+            if (menu is GameMenu gameMenu) {
+                if (gameMenu.currentTab == GameMenu.inventoryTab) {
+                    Game1.player.CursorSlotItem = value;
+                    return;
+                }
+
+                if (gameMenu.currentTab == GameMenu.craftingTab) {
+                    (gameMenu.pages[GameMenu.craftingTab] as CraftingPage)!.heldItem = value;
+                    return;
+                }
+
+                throw new InvalidOperationException();
+            }
+
+            if (menu is MenuWithInventory menuWithInventory) {
+                menuWithInventory.heldItem = value;
+                return;
+            }
+
+            Game1.player.CursorSlotItem = value;
+        }
+    }
 }
