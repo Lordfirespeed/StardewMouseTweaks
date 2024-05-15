@@ -23,6 +23,7 @@ internal sealed class Entrypoint : Mod
         Monitor = base.Monitor;
         _harmony = new Harmony(ModManifest.UniqueID);
         _harmony.CreateClassProcessor(typeof(InventoryMenuPatches)).Patch();
+        _harmony.CreateClassProcessor(typeof(ItemGrabMenuPatches)).Patch();
         _dragOperationManager = new DragOperationManager(helper, Monitor);
     }
 }
