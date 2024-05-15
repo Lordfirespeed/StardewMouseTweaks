@@ -84,24 +84,28 @@ public static class MenuUtils
             return false;
         }
 
-        if (clickableMenu is ItemGrabMenu itemGrabMenu) {
-            throw new NotImplementedException();
+        if (clickableMenu is MenuWithInventory menuWithInventory) {
+            if (menuWithInventory.inventory.IsWithinBounds(cursorPosition)) {
+                menu = menuWithInventory.inventory;
+                return true;
+            }
+
+            if (menuWithInventory is ItemGrabMenu itemGrabMenu && itemGrabMenu.ItemsToGrabMenu.IsWithinBounds(cursorPosition)) {
+                menu = itemGrabMenu.ItemsToGrabMenu;
+                return true;
+            }
+
+            if (menuWithInventory is QuestContainerMenu questContainerMenu && questContainerMenu.ItemsToGrabMenu.IsWithinBounds(cursorPosition)) {
+                menu = questContainerMenu.ItemsToGrabMenu;
+                return true;
+            }
+
+            return false;
         }
 
-        if (clickableMenu is JunimoNoteMenu junimoNoteMenu) {
-            throw new NotImplementedException();
-        }
-
-        if (clickableMenu is QuestContainerMenu) {
-            throw new NotImplementedException();
-        }
-
-        if (clickableMenu is ShopMenu) {
-            throw new NotImplementedException();
-        }
-
-        if (clickableMenu is StorageContainer) {
-            throw new NotImplementedException();
+        if (clickableMenu is JunimoNoteMenu junimoNoteMenu && junimoNoteMenu.inventory.IsWithinBounds(cursorPosition)) {
+            menu = junimoNoteMenu.inventory;
+            return true;
         }
 
         return false;
@@ -124,6 +128,10 @@ public static class MenuUtils
 
             if (menu is MenuWithInventory menuWithInventory) {
                 return menuWithInventory.heldItem;
+            }
+
+            if (menu is JunimoNoteMenu junimoNoteMenu) {
+                return junimoNoteMenu.heldItem;
             }
 
             return Game1.player.CursorSlotItem;
@@ -150,6 +158,11 @@ public static class MenuUtils
 
             if (menu is MenuWithInventory menuWithInventory) {
                 menuWithInventory.heldItem = value;
+                return;
+            }
+
+            if (menu is JunimoNoteMenu junimoNoteMenu) {
+                junimoNoteMenu.heldItem = value;
                 return;
             }
 
