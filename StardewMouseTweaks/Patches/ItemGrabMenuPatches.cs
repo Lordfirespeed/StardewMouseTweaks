@@ -16,10 +16,12 @@ namespace StardewMouseTweaks.Patches;
 public class ItemGrabMenuPatches : IPatch
 {
     private static IModHelper _helper = null!;
+    private static IMonitor _monitor = null!;
 
     public void Initialize(IModHelper helper, IMonitor monitor)
     {
         _helper = helper;
+        _monitor = monitor;
     }
 
     [HarmonyPatch(nameof(ItemGrabMenu.draw))]
