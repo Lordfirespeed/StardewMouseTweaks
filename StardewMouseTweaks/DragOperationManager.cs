@@ -6,6 +6,7 @@ using StardewModdingAPI.Events;
 using StardewMouseTweaks.DragOperations;
 using StardewMouseTweaks.Extensions;
 using StardewValley;
+using StardewValley.Menus;
 
 namespace StardewMouseTweaks;
 
@@ -173,25 +174,41 @@ public class DragOperationManager
             return;
         }
 
-        OnMenuSwapped();
+        if (ContextChanged()) {
+            OnMenuSwapped();
+        }
+        else {
+            OnMenuSwappedForSameContext();
+        }
         return;
 
         void OnMenuClosed()
         {
-            Monitor.Log("Menu closed", LogLevel.Debug);
             ResetOngoingDragOperation();
+        }
+
+        bool ContextChanged()
+        {
+            if (args is { OldMenu: ItemGrabMenu oldItemGrabMenu, NewMenu: ItemGrabMenu newItemGrabMenu }) {
+                return !ReferenceEquals(oldItemGrabMenu.context, newItemGrabMenu.context);
+            }
+
+            return true;
         }
 
         void OnMenuSwapped()
         {
-            Monitor.Log("Menu swapped", LogLevel.Debug);
             ResetOngoingDragOperation();
         }
 
-        void OnMenuOpened()
+        void OnMenuSwappedForSameContext()
         {
-            Monitor.Log("Menu opened", LogLevel.Debug);
+            if (args is { OldMenu: ItemGrabMenu { heldItem: { } oldHelditem }, NewMenu: ItemGrabMenu newMenu }) {
+                newMenu.heldItem = oldHelditem;
+            }
         }
+
+        void OnMenuOpened() { }
     }
 
     private void OnOngoingDragOperationCompleted(object? sender, EventArgs args)
