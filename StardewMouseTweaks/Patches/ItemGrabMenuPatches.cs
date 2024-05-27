@@ -132,6 +132,13 @@ public class ItemGrabMenuPatches : IPatch
         }
     }
 
+    /**
+     * Changes behaviour when left-clicking on a shipping bin slot.
+     * Usually <c>player.addItemToInventoryBool</c> is attempted immediately, and <c>menu.heldItem</c>
+     * is assigned <c>null</c>.
+     * This patch invokes <c>player.addItemToInventoryBool</c> only when the shift key is held, and <c>menu.heldItem</c>
+     * persists because shipping menus are not 'swapped' when inventories are updated.
+     */
     [HarmonyPatch(nameof(ItemGrabMenu.receiveLeftClick))]
     [HarmonyTranspiler]
     [UsedImplicitly]
