@@ -24,6 +24,8 @@ public class ItemGrabMenuPatches : IPatch
         _monitor = monitor;
     }
 
+    #region 'drawing' patches
+
     [HarmonyPatch(nameof(ItemGrabMenu.draw))]
     [HarmonyTranspiler]
     [UsedImplicitly]
@@ -80,6 +82,10 @@ public class ItemGrabMenuPatches : IPatch
 
         return matcher.InstructionEnumeration();
     }
+
+    #endregion
+
+    #region left-click patches
 
     public static void LeftClickShippingBinSlot(ItemGrabMenu menu)
     {
@@ -160,4 +166,6 @@ public class ItemGrabMenuPatches : IPatch
 
         return matcher.InstructionEnumeration();
     }
+
+    #endregion
 }
