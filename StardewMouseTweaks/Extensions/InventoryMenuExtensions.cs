@@ -40,7 +40,19 @@ public static class InventoryMenuExtensions
 
         public ClickableComponent ClickableComponent => InventoryMenu.inventory[Index];
 
-        public Item? Item => InventoryMenu.actualInventory[Index];
+        public Item? Item {
+            get {
+                if (Index < 0 || InventoryMenu.capacity <= Index)
+                    throw new IndexOutOfRangeException();
+
+                try {
+                    return InventoryMenu.actualInventory[Index];
+                }
+                catch (IndexOutOfRangeException) {
+                    return null;
+                }
+            }
+        }
 
         public Item? AddItem(Item itemToAdd, ItemGrabMenu.behaviorOnItemSelect? onAddFunction = null)
         {
