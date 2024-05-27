@@ -167,5 +167,152 @@ public class ItemGrabMenuPatches : IPatch
         return matcher.InstructionEnumeration();
     }
 
+    public static void LeftClickReceivingMenu(ItemGrabMenu menu)
+    {
+        Debug.Assert(menu.showReceivingMenu);
+
+        if (_helper.Input.IsDown(SButton.LeftShift)) {
+            if (!Game1.player.addItemToInventoryBool(menu.heldItem)) return;
+
+            menu.heldItem = null;
+            Game1.playSound("coin");
+        }
+    }
+
+    /**
+     * Changes behaviour when left-clicking on an item in the 'receiving menu' (e.g. a chest's inventory).
+     * Usually <c>player.addItemToInventoryBool</c> is invoked immediately and the menu is
+     * 'swapped' to a fresh instance with `menu.heldItem` <c>null</c>.
+     * This patch invokes <c>player.addItemToInventoryBool</c> only when the shift key is held, and an event handler
+     * persists <c>menu.heldItem</c> across the 'swap'.
+     * <seealso cref="DragOperationManager.OnMenuChanged"/>
+     */
+    [HarmonyPatch(nameof(ItemGrabMenu.receiveLeftClick))]
+    [HarmonyTranspiler]
+    [UsedImplicitly]
+    public static IEnumerable<CodeInstruction> PatchLeftClickReceivingMenu(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
+    {
+        var matcher = new CodeMatcher(instructions, generator);
+
+        matcher.MatchEndForward(
+            new CodeMatch(OpCodes.Ldarg_0),
+            new CodeMatch(OpCodes.Call, AccessTools.PropertyGetter(typeof(MenuWithInventory), nameof(MenuWithInventory.heldItem))),
+            new CodeMatch(instr => instr.opcode == OpCodes.Brtrue),
+            new CodeMatch(OpCodes.Ldarg_0),
+            new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(ItemGrabMenu), nameof(ItemGrabMenu.showReceivingMenu))),
+            new CodeMatch(instr => instr.opcode == OpCodes.Brfalse)
+        );
+        if (matcher.IsInvalid) throw new InvalidOperationException();
+
+        matcher.MatchStartForward(
+            new CodeMatch(OpCodes.Call, AccessTools.PropertyGetter(typeof(Game1), nameof(Game1.player))),
+            new CodeMatch(OpCodes.Ldarg_0),
+            new CodeMatch(OpCodes.Call, AccessTools.PropertyGetter(typeof(MenuWithInventory), nameof(MenuWithInventory.heldItem))),
+            new CodeMatch(OpCodes.Ldc_I4_0),
+            new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(Farmer), nameof(Farmer.addItemToInventoryBool))),
+            new CodeMatch(instr => instr.opcode == OpCodes.Brfalse)
+        );
+        if (matcher.IsInvalid) throw new InvalidOperationException();
+
+        var labelsToMove = matcher.Labels;
+
+        matcher.InsertAndAdvance(
+            new CodeInstruction(OpCodes.Ldarg_0) { labels = labelsToMove },
+            new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ItemGrabMenuPatches), nameof(LeftClickReceivingMenu)))
+        );
+
+        var deleteFromIndex = matcher.Pos;
+        matcher.MatchStartForward(
+            new CodeMatch(instr => instr.opcode == OpCodes.Br_S)
+        );
+        if (matcher.IsInvalid) throw new InvalidOperationException();
+        matcher.RemoveInstructionsInRange(deleteFromIndex, matcher.Pos - 1);
+
+        _monitor.LogInstructionsFrom(matcher, LogLevel.Info);
+
+        return matcher.InstructionEnumeration();
+    }
+
+    public static void LeftClickInventory(ItemGrabMenu menu)
+    {
+        if (_helper.Input.IsDown(SButton.LeftShift)) {
+            menu.behaviorFunction(menu.heldItem, Game1.player);
+            menu.heldItem = null;
+        }
+    }
+
+    /**
+     * Changes behaviour when left-clicking on an item in the player's inventory.
+     * Usually <c>menu.BehaviourFunction</c> is invoked immediately, `menu.heldItem` is <b>not</b> set to <c>null</c>, and the menu is
+     * 'swapped' to a fresh instance with `menu.heldItem` <c>null</c>.
+     * This patch invokes <c>menu.BehaviourFunction</c> only when the shift key is held, and an event handler
+     * persists <c>menu.heldItem</c> across the 'swap'.
+     * <seealso cref="DragOperationManager.OnMenuChanged"/>
+     */
+    [HarmonyPatch(nameof(ItemGrabMenu.receiveLeftClick))]
+    [HarmonyTranspiler]
+    [UsedImplicitly]
+    public static IEnumerable<CodeInstruction> PatchLeftClickInventory(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
+    {
+        var matcher = new CodeMatcher(instructions, generator);
+
+        _monitor.LogInstructionsFrom(matcher, LogLevel.Info);
+
+        matcher.MatchEndForward(
+            new CodeMatch(OpCodes.Ldarg_0),
+            new CodeMatch(OpCodes.Call, AccessTools.PropertyGetter(typeof(MenuWithInventory), nameof(MenuWithInventory.heldItem))),
+            new CodeMatch(instr => instr.opcode == OpCodes.Brtrue),
+            new CodeMatch(OpCodes.Ldarg_0),
+            new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(ItemGrabMenu), nameof(ItemGrabMenu.showReceivingMenu))),
+            new CodeMatch(instr => instr.opcode == OpCodes.Brfalse)
+        );
+        if (matcher.IsInvalid) throw new InvalidOperationException();
+
+        matcher.MatchEndForward(
+            new CodeMatch(OpCodes.Ldarg_0),
+            new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(ItemGrabMenu), nameof(ItemGrabMenu.reverseGrab))),
+            new CodeMatch(instr => instr.opcode == OpCodes.Brtrue_S),
+            new CodeMatch(OpCodes.Ldarg_0),
+            new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(ItemGrabMenu), nameof(ItemGrabMenu.behaviorFunction))),
+            new CodeMatch(instr => instr.opcode == OpCodes.Brfalse_S),
+            new CodeMatch(OpCodes.Ldarg_0),
+            new CodeMatch(OpCodes.Ldarg_1),
+            new CodeMatch(OpCodes.Ldarg_2),
+            new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(IClickableMenu), nameof(IClickableMenu.isWithinBounds))),
+            new CodeMatch(instr => instr.opcode == OpCodes.Brfalse_S)
+        );
+        if (matcher.IsInvalid) throw new InvalidOperationException();
+
+        matcher.MatchStartForward(
+            new CodeMatch(OpCodes.Ldarg_0),
+            new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(ItemGrabMenu), nameof(ItemGrabMenu.behaviorFunction))),
+            new CodeMatch(OpCodes.Ldarg_0),
+            new CodeMatch(OpCodes.Call, AccessTools.PropertyGetter(typeof(MenuWithInventory), nameof(MenuWithInventory.heldItem))),
+            new CodeMatch(OpCodes.Call, AccessTools.PropertyGetter(typeof(Game1), nameof(Game1.player))),
+            new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(ItemGrabMenu.behaviorOnItemSelect), nameof(ItemGrabMenu.behaviorOnItemSelect.Invoke)))
+        );
+        if (matcher.IsInvalid) throw new InvalidOperationException();
+
+        matcher.Advance(1);
+        matcher.InsertAndAdvance(
+            new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ItemGrabMenuPatches), nameof(LeftClickInventory)))
+        );
+        matcher.RemoveInstructions(5);
+
+        matcher.MatchStartForward(
+            new CodeMatch(OpCodes.Ldarg_0),
+            new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(ItemGrabMenu), nameof(ItemGrabMenu.destroyItemOnClick))),
+            new CodeMatch(instr => instr.opcode == OpCodes.Brfalse_S),
+            new CodeMatch(OpCodes.Ldarg_0),
+            new CodeMatch(OpCodes.Ldnull),
+            new CodeMatch(OpCodes.Call, AccessTools.PropertySetter(typeof(MenuWithInventory), nameof(MenuWithInventory.heldItem))),
+            new CodeMatch(OpCodes.Ret)
+        );
+        matcher.SetAndAdvance(OpCodes.Nop, null);
+        matcher.RemoveInstructions(6);
+
+        return matcher.InstructionEnumeration();
+    }
+
     #endregion
 }
