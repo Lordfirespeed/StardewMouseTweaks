@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection.Emit;
 using HarmonyLib;
 using JetBrains.Annotations;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
+using StardewMouseTweaks.Extensions;
 using StardewValley;
 using StardewValley.Menus;
 using Rectangle = System.Drawing.Rectangle;
@@ -310,6 +312,40 @@ public class ItemGrabMenuPatches : IPatch
         );
         matcher.SetAndAdvance(OpCodes.Nop, null);
         matcher.RemoveInstructions(6);
+
+        return matcher.InstructionEnumeration();
+    }
+
+    #endregion
+
+    #region right-click patches
+
+    public static void RightClickReceivingMenu(ItemGrabMenu menu)
+    {
+        Debug.Assert(menu.showReceivingMenu);
+    }
+
+    [HarmonyPatch(nameof(ItemGrabMenu.receiveRightClick))]
+    [HarmonyTranspiler]
+    [UsedImplicitly]
+    public static IEnumerable<CodeInstruction> PatchRightClickReceivingMenu(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
+    {
+        var matcher = new CodeMatcher(instructions, generator);
+
+        return matcher.InstructionEnumeration();
+    }
+
+    public static void RightClickInventory(ItemGrabMenu menu)
+    {
+
+    }
+
+    [HarmonyPatch(nameof(ItemGrabMenu.receiveRightClick))]
+    [HarmonyTranspiler]
+    [UsedImplicitly]
+    public static IEnumerable<CodeInstruction> PatchRightClickInventory(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
+    {
+        var matcher = new CodeMatcher(instructions, generator);
 
         return matcher.InstructionEnumeration();
     }
