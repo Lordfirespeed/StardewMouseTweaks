@@ -108,9 +108,6 @@ public class ItemGrabMenuPatches : IPatch
 
             Game1.getFarm().getShippingBin(Game1.player).Remove(lastItemShipped);
 
-            if (_helper is null) throw new InvalidOperationException("HUH?");
-            if (_helper.Input is null) throw new InvalidOperationException("what.");
-
             if (_helper.Input.IsDown(SButton.LeftShift)) {
                 if (!Game1.player.addItemToInventoryBool(lastItemShipped)) {
                     Game1.getFarm().getShippingBin(Game1.player).Add(lastItemShipped);
